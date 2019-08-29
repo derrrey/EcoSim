@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3167522819744317074}
   - component: {fileID: 3167522819744317073}
+  - component: {fileID: 1811742502}
   m_Layer: 0
   m_Name: WorldManager
   m_TagString: Untagged
@@ -43,17 +44,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04dfb81eec50e1543b4dbcb71dddacd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grassPrefab: {fileID: 7360392683890173456, guid: a13dbcd8fcc616d40a9d6cf8c2e8f817,
-    type: 3}
-  waterPrefab: {fileID: 8897496539249358223, guid: 1d975088b28bae24ab5bc1184ea35140,
-    type: 3}
-  shorePrefab: {fileID: 4975446999239199438, guid: eefec33cd5f5c0742be7bb5f2c390676,
-    type: 3}
-  oakPrefab: {fileID: 405256, guid: c44bd9bdc114d4a60932c0087d9d1732, type: 3}
-  palmPrefab: {fileID: 481554, guid: c6b7fb383a3534b039692b5485b6e739, type: 3}
-  waterThreshold: 0.3
-  shoreThreshold: 0.4
-  oakThreshold: 0.7
-  oakProb: 0.05
-  palmThreshold: 0.5
-  palmProb: 0.05
+  drawMode: 1
+  worldWidth: 200
+  worldHeight: 200
+  scale: 25
+  octaves: 5
+  persistance: 0.319
+  lacunarity: 2.48
+  autoUpdate: 1
+  regions:
+  - name: Water1
+    height: 0.45
+    color: {r: 0.0731132, g: 0.19657551, b: 0.5, a: 0}
+  - name: Water2
+    height: 0.52
+    color: {r: 0.16078429, g: 0.6317758, b: 0.8392157, a: 0}
+  - name: Shore1
+    height: 0.6
+    color: {r: 0.8396226, g: 0.79067004, b: 0.16237983, a: 0}
+  - name: Shore2
+    height: 0.65
+    color: {r: 0.7264151, g: 0.68814933, b: 0.17475079, a: 0}
+  - name: Land1
+    height: 0.8
+    color: {r: 0.22084767, g: 0.6792453, b: 0.11854753, a: 0}
+  - name: Land2
+    height: 1
+    color: {r: 0.03804734, g: 0.5377358, b: 0.039440624, a: 0}
+--- !u!114 &1811742502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3167522819744317072}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae51ad33fdcda044bf54b28bcd0cc7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textureRenderer: {fileID: 0}

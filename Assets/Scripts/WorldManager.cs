@@ -2,157 +2,84 @@
 
 public class WorldManager : MonoBehaviour
 {
-    // Tiles
-    [Header("Ground Tile Prefabs")]
-    [SerializeField]
-    Transform grassPrefab = null;
-    [SerializeField]
-    Transform waterPrefab = null;
-    [SerializeField]
-    Transform shorePrefab = null;
-    Transform[] tilePrefabs;
-    GameObject tileParent = null;
-
-    [Header("Tree Prefabs")]
-    [SerializeField]
-    Transform oakPrefab = null;
-    [SerializeField]
-    Transform palmPrefab = null;
-    GameObject treeParent = null;
+    public enum DrawMode { NoiseMap, ColorMap };
 
     // World options
     [Header("World Options")]
+    public DrawMode drawMode;
+    [SerializeField]
+    int worldWidth = 0;
+    [SerializeField]
+    int worldHeight = 0;
+    [SerializeField]
+    float scale = 0.0f;
+    [SerializeField]
+    int octaves = 0;
     [SerializeField, Range(0.0f, 1.0f)]
-    float waterThreshold = 0.0f;
-    [SerializeField, Range(0.0f, 1.0f)]
-    float shoreThreshold = 0.0f;
-    [SerializeField, Range(0.0f, 1.0f)]
-    float oakThreshold = 0.0f;
-    [SerializeField, Range(0.0f, 1.0f)]
-    float oakProb = 0.0f;
-    [SerializeField, Range(0.0f, 1.0f)]
-    float palmThreshold = 0.0f;
-    [SerializeField, Range(0.0f, 1.0f)]
-    float palmProb = 0.0f;
-    static int worldSize = 64;
+    float persistance = 0.0f;
+    [SerializeField]
+    float lacunarity = 0.0f;
+    public bool autoUpdate = false;
+    public TerrainType[] regions;
 
     // The world
-    enum Tile { Grass, Water, Shore };
-    struct TileWithPerlinNoise
-    {
-        public Tile tile;
-        public float noise;
-    }
-    TileWithPerlinNoise[,] tileMap = new TileWithPerlinNoise[worldSize, worldSize];
+    float[,] noiseMap;
 
     // Start is called before the first frame update
     void Start()
     {
-        tileParent = new GameObject("WorldTiles");
-        treeParent = new GameObject("WorldTrees");
-        ConstructPrefabArray();
-        GenerateTileMap();
-        GenerateTrees();
-        InstantiateTileMap();
+        GenerateAndDisplayMap();
     }
 
-    // Constructs an array from the tile prefabs
-    void ConstructPrefabArray()
+    public void GenerateAndDisplayMap()
     {
-        tilePrefabs = new Transform[] { grassPrefab, waterPrefab, shorePrefab };
-    }
+        noiseMap = NoiseMap.GenerateNoiseMap(worldWidth, worldHeight, scale, octaves, persistance, lacunarity);
 
-    // Generates a tile map
-    void GenerateTileMap()
-    {
-        for (int yCoord = 0; yCoord < worldSize; ++yCoord)
+        Color[] colorMap = new Color[worldWidth * worldHeight];
+        for (int y = 0; y < worldHeight; ++y)
         {
-            for (int xCoord = 0; xCoord < worldSize; ++xCoord)
+            for(int x = 0; x < worldWidth; ++x)
             {
-                SetTileForIndex(xCoord, yCoord);
-            }
-        }
-    }
-
-    // Sets a tile index based on perlin noise
-    void SetTileForIndex(int xCoord, int yCoord)
-    {
-        float perlinNoise = Mathf.PerlinNoise(xCoord * 0.1f, yCoord * 0.1f);
-        if (perlinNoise <= waterThreshold)
-        {
-            tileMap[xCoord, yCoord].tile = Tile.Water;
-        }
-        else if (perlinNoise <= shoreThreshold)
-        {
-            tileMap[xCoord, yCoord].tile = Tile.Shore;
-        }
-        else
-        {
-            tileMap[xCoord, yCoord].tile = Tile.Grass;
-        }
-        tileMap[xCoord, yCoord].noise = perlinNoise;
-    }
-
-    // Generates and instantiates trees
-    void GenerateTrees()
-    {
-        for (int yCoord = 0; yCoord < worldSize; ++yCoord)
-        {
-            for (int xCoord = 0; xCoord < worldSize; ++xCoord)
-            {
-                float currentNoise = tileMap[xCoord, yCoord].noise;
-                if(currentNoise <= palmThreshold && tileMap[xCoord, yCoord].tile != Tile.Water)
+                float currentHeight = noiseMap[x, y];
+                for (int i = 0; i < regions.Length; ++i)
                 {
-                    float randomNumber = Random.value;
-                    if(randomNumber >= 1.0f - palmProb)
+                    if (currentHeight <= regions[i].height)
                     {
-                        InstantiateTreeOnCoordinates(palmPrefab, new Vector3(xCoord, 0, yCoord));
-                    }
-                }
-                else if(currentNoise >= oakThreshold)
-                {
-                    float randomNumber = Random.value;
-                    if (randomNumber >= 1.0f - oakProb)
-                    {
-                        InstantiateTreeOnCoordinates(oakPrefab, new Vector3(xCoord, 0, yCoord));
+                        colorMap[y * worldWidth + x] = regions[i].color;
+                        break;
                     }
                 }
             }
         }
-    }
 
-    // Instantiates the given tree prefab
-    void InstantiateTreeOnCoordinates(Transform treePrefab, Vector3 coordinates)
-    {
-        Quaternion randomRotation = Random.rotation;
-        randomRotation.x = 0;
-        randomRotation.z = 0;
-        Transform newTree = Instantiate(treePrefab, coordinates, randomRotation, treeParent.transform);
-        float newScale = System.Math.Max(Random.value, 0.7f);
-        newTree.localScale = new Vector3(newScale, newScale, newScale);
-    }
-
-    // Instantiates tile prefabs based on the generated tile map
-    void InstantiateTileMap()
-    {
-        for (int tileIndex = 0; tileIndex < worldSize * worldSize; ++tileIndex)
+        MapDisplay mapDisplay = FindObjectOfType<MapDisplay>();
+        if(drawMode == DrawMode.NoiseMap)
         {
-            int xCoord = tileIndex % worldSize;
-            int yCoord = tileIndex / worldSize;
-
-            Transform newTile = Instantiate(tilePrefabs[(int)tileMap[xCoord, yCoord].tile], new Vector3(xCoord, 0, yCoord), Quaternion.identity, tileParent.transform);
-
-            SetColorBasedOnNoiseForTile(newTile, tileMap[xCoord, yCoord].noise);
+            mapDisplay.DrawTexture(mapDisplay.TextureFromNoiseMap(noiseMap));
+        }
+        else if(drawMode == DrawMode.ColorMap)
+        {
+            mapDisplay.DrawTexture(mapDisplay.TextureFromColorMap(colorMap, worldWidth, worldHeight));
         }
     }
 
-    // Sets the v value of a tile based on the perlin noise
-    void SetColorBasedOnNoiseForTile(Transform newTile, float noise)
+    private void OnValidate()
     {
-        Renderer tileRenderer = newTile.GetComponent<Renderer>();
-        float colorH, colorS, colorV;
-        Color.RGBToHSV(tileRenderer.material.GetColor("_Color"), out colorH, out colorS, out colorV);
-        colorV -= (noise * 0.4f);
-        tileRenderer.material.SetColor("_Color", Color.HSVToRGB(colorH, colorS, colorV));
+        if (worldWidth <= 0)
+            worldWidth = 1;
+        if (worldHeight <= 0)
+            worldHeight = 1;
+        if (octaves < 0)
+            octaves = 0;
+        if (lacunarity < 1)
+            lacunarity = 1;
     }
+}
+
+[System.Serializable]
+public struct TerrainType
+{
+    public string name;
+    public float height;
+    public Color color;
 }
