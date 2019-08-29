@@ -2,7 +2,9 @@
 
 public class WorldManager : MonoBehaviour
 {
-    public enum DrawMode { NoiseMap, ColorMap };
+    public enum DrawMode { NoiseMap, ColorMap, Mesh };
+    [SerializeField]
+    GameObject meshObject = null;
 
     // World options
     [Header("World Options")]
@@ -60,6 +62,13 @@ public class WorldManager : MonoBehaviour
         else if(drawMode == DrawMode.ColorMap)
         {
             mapDisplay.DrawTexture(mapDisplay.TextureFromColorMap(colorMap, worldWidth, worldHeight));
+        }
+        else if (drawMode == DrawMode.Mesh)
+        {
+            Mesh mesh = MeshGenerator.GenerateMesh(noiseMap).CreateMesh();
+            MeshCollider meshCollider = meshObject.AddComponent<MeshCollider>();
+            meshCollider.sharedMesh = mesh;
+            mapDisplay.DrawMesh(mesh, mapDisplay.TextureFromColorMap(colorMap, worldWidth, worldHeight));
         }
     }
 
