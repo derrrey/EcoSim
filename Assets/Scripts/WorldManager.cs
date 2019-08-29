@@ -66,11 +66,12 @@ public class WorldManager : MonoBehaviour
         else if (drawMode == DrawMode.Mesh)
         {
             Mesh mesh = MeshGenerator.GenerateMesh(noiseMap).CreateMesh();
-            if (meshObject.GetComponent<MeshCollider>() == null)
+            MeshCollider meshCollider = meshObject.GetComponent<MeshCollider>();
+            if (meshCollider == null)
             {
-                MeshCollider meshCollider = meshObject.AddComponent<MeshCollider>();
-                meshCollider.sharedMesh = mesh;
+                meshCollider = meshObject.AddComponent<MeshCollider>();
             }
+            meshCollider.sharedMesh = mesh;
             mapDisplay.DrawMesh(mesh, mapDisplay.TextureFromColorMap(colorMap, worldWidth, worldHeight));
         }
     }
