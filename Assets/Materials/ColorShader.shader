@@ -16,9 +16,11 @@
 		#pragma target 3.0
 
 		const static int defaultNumColors = 8;
+		const static float epsilon = 1E-4;
 		int _NumColors;
 		float3 _Colors[defaultNumColors];
 		float _Heights[defaultNumColors];
+		float _Blendings[defaultNumColors];
 		float _MinHeight;
 		float _MaxHeight;
 
@@ -37,7 +39,7 @@
 			float heightPercent = inverseLerp(_MinHeight, _MaxHeight, IN.worldPos.y);
 			for (int i = 0; i < _NumColors; ++i)
 			{
-				float drawStrength = saturate(sign(heightPercent - _Heights[i]));
+				float drawStrength = inverseLerp(-_Blendings[i] / 2 - epsilon, _Blendings[i] / 2, heightPercent - _Heights[i]);
 				o.Albedo = o.Albedo * (1 - drawStrength) + _Colors[i] * drawStrength;
 			}
         }
