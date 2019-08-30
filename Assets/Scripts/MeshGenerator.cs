@@ -2,7 +2,7 @@
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateMesh(float[,] noiseMap)
+    public static MeshData GenerateMesh(float[,] noiseMap, float meshMultiplier)
     {
         int width = noiseMap.GetLength(0);
         int height = noiseMap.GetLength(1);
@@ -16,8 +16,18 @@ public static class MeshGenerator
         {
             for (int x = 0; x < width; x++)
             {
-                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, noiseMap[x, y] * 70, topLeftZ - y);
+                float verticeY = noiseMap[x, y] * meshMultiplier;
+                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, verticeY, topLeftZ - y);
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
+
+                if(verticeY > meshData.maxHeight)
+                {
+                    meshData.maxHeight = verticeY;
+                }
+                else if(verticeY < meshData.minHeight)
+                {
+                    meshData.minHeight = verticeY;
+                }
 
                 if(x < width - 1 && y < height - 1)
                 {
@@ -37,6 +47,8 @@ public class MeshData
     public Vector3[] vertices;
     public int[] triangles;
     public Vector2[] uvs;
+    public float minHeight;
+    public float maxHeight;
 
     int triangleIndex;
 
@@ -45,6 +57,8 @@ public class MeshData
         vertices = new Vector3[meshWidth * meshHeight];
         uvs = new Vector2[meshWidth * meshHeight];
         triangles = new int[(meshWidth - 1) * (meshHeight - 1) * 6];
+        minHeight = float.MaxValue;
+        maxHeight = -float.MaxValue;
     }
 
     public void AddTriangle(int a, int b, int c)
