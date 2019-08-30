@@ -23,6 +23,8 @@ public class WorldManager : MonoBehaviour
     [SerializeField]
     float meshMultiplier = 0.0f;
     public TextureData textureData = null;
+    [SerializeField]
+    AnimationCurve animationCurve = null;
 
     // The world
     float[,] noiseMap;
@@ -35,7 +37,7 @@ public class WorldManager : MonoBehaviour
 
     public void GenerateAndDisplayMap()
     {
-        noiseMap = NoiseMap.GenerateNoiseMap(worldWidth, worldHeight, scale, octaves, persistance, lacunarity);
+        noiseMap = NoiseMap.GenerateNoiseMap(worldWidth, worldHeight, scale, octaves, persistance, lacunarity, animationCurve);
 
         MapDisplay mapDisplay = FindObjectOfType<MapDisplay>();
         MeshData meshData = MeshGenerator.GenerateMesh(noiseMap, meshMultiplier);
