@@ -13,30 +13,28 @@ MonoBehaviour:
   m_Name: DefaultTextureData
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  colors:
-  - {r: 0.09714311, g: 0.2918299, b: 0.5566038, a: 0}
-  - {r: 0, g: 0.6545739, b: 1, a: 0}
-  - {r: 0.9051483, g: 0.9339623, b: 0.09251513, a: 0}
-  - {r: 0.7120359, g: 0.7264151, b: 0.01713243, a: 0}
-  - {r: 0.13519046, g: 0.9245283, b: 0.25900814, a: 0}
-  - {r: 0.010412954, g: 0.24528301, b: 0.046334267, a: 0}
-  - {r: 0.16351013, g: 0.16981131, b: 0.1225525, a: 0}
-  - {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 0}
-  heights:
-  - 0
-  - 0.159
-  - 0.286
-  - 0.333
-  - 0.433
-  - 0.608
-  - 0.649
-  - 0.953
-  blendings:
-  - 1
-  - 0.31
-  - 0
-  - 0.474
-  - 0.52
-  - 0.544
-  - 0.181
-  - 0.099
+  layers:
+  - baseColor: {r: 1, g: 1, b: 1, a: 0}
+    layerHeight: 0
+    layerBlending: 0.375
+    drawStrength: 0
+    layerScale: 100
+    texture: {fileID: 2800000, guid: bfd675cc0db1d4656b75dc6d6ba91142, type: 3}
+  - baseColor: {r: 1, g: 1, b: 1, a: 0}
+    layerHeight: 0.189
+    layerBlending: 0.087
+    drawStrength: 0
+    layerScale: 100
+    texture: {fileID: 2800000, guid: c6e0767b1f8c34890ac245217f4b9731, type: 3}
+  - baseColor: {r: 1, g: 1, b: 1, a: 0}
+    layerHeight: 0.412
+    layerBlending: 0.146
+    drawStrength: 0
+    layerScale: 100
+    texture: {fileID: 2800000, guid: 440eb36db91ca410f800ff3cfe43572f, type: 3}
+  - baseColor: {r: 1, g: 1, b: 1, a: 0}
+    layerHeight: 0.591
+    layerBlending: 0.128
+    drawStrength: 0
+    layerScale: 100
+    texture: {fileID: 2800000, guid: 18214e9d6af6248559d501391856f1c7, type: 3}

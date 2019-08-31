@@ -15,19 +15,26 @@
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
 
-		const static int defaultNumColors = 8;
+		#include "UnityCG.cginc"
+
+		const static int defaultNumLayers = 8;
 		const static float epsilon = 1E-4;
-		int _NumColors;
-		float3 _Colors[defaultNumColors];
-		float _Heights[defaultNumColors];
-		float _Blendings[defaultNumColors];
+		int _NumLayers;
+		float3 _Colors[defaultNumLayers];
+		float _Heights[defaultNumLayers];
+		float _Blendings[defaultNumLayers];
+		float _DrawStrengths[defaultNumLayers];
+		float _Scales[defaultNumLayers];
 		float _MinHeight;
 		float _MaxHeight;
 
         struct Input
         {
 			float3 worldPos;
+			float3 worldNormal;
         };
+
+		UNITY_DECLARE_TEX2DARRAY(_TextureArray);
 
 		float inverseLerp(float min, float max, float value)
 		{
@@ -36,11 +43,19 @@
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
+			float3 axes = abs(IN.worldNormal);
+			axes /= axes.x + axes.y + axes.z;
 			float heightPercent = inverseLerp(_MinHeight, _MaxHeight, IN.worldPos.y);
-			for (int i = 0; i < _NumColors; ++i)
+			for (int i = 0; i < _NumLayers; ++i)
 			{
+				float3 scaledTexturePos = IN.worldPos / _Scales[i];
+				float3 textureX = UNITY_SAMPLE_TEX2DARRAY(_TextureArray, float3(scaledTexturePos.y, scaledTexturePos.z, i)) * axes.x;
+				float3 textureY = UNITY_SAMPLE_TEX2DARRAY(_TextureArray, float3(scaledTexturePos.x, scaledTexturePos.z, i)) * axes.y;
+				float3 textureZ = UNITY_SAMPLE_TEX2DARRAY(_TextureArray, float3(scaledTexturePos.x, scaledTexturePos.y, i)) * axes.z;
 				float drawStrength = inverseLerp(-_Blendings[i] / 2 - epsilon, _Blendings[i] / 2, heightPercent - _Heights[i]);
-				o.Albedo = o.Albedo * (1 - drawStrength) + _Colors[i] * drawStrength;
+				float3 color = textureX + textureY + textureZ;
+				color = _Colors[i] * (1 - _DrawStrengths[i]) + color * _DrawStrengths[i];
+				o.Albedo = o.Albedo * (1 - drawStrength) + color * drawStrength;
 			}
         }
         ENDCG
